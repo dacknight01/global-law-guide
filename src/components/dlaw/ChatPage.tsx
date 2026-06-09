@@ -99,7 +99,7 @@ export function ChatPage({ threadId }: { threadId: string }) {
     () =>
       new DefaultChatTransport({
         api: "/api/chat",
-        headers: () => (token ? { Authorization: `Bearer ${token}` } : {}),
+        headers: () => (token ? ({ Authorization: `Bearer ${token}` } as Record<string, string>) : ({} as Record<string, string>)),
         body: { threadId },
       }),
     [token, threadId],
