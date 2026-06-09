@@ -88,6 +88,7 @@ export const Route = createFileRoute("/api/chat")({
           model,
           system: DLAW_SYSTEM_PROMPT,
           messages: convertToModelMessages(uiMessages),
+
         });
 
         return result.toUIMessageStreamResponse({
