@@ -281,7 +281,7 @@ function ChatInner({
           ) : (
             messages.map((m) => (
               <Message key={m.id} from={m.role}>
-                <MessageContent variant={m.role === "user" ? "contained" : "flat"}>
+                <MessageContent className={m.role === "user" ? "bg-primary text-primary-foreground" : "bg-transparent border-0 px-0 py-0"}>
                   {m.parts.map((part, i) => {
                     if (part.type === "text") {
                       if (m.role === "assistant") {
@@ -305,7 +305,7 @@ function ChatInner({
           )}
           {status === "submitted" && (
             <Message from="assistant">
-              <MessageContent variant="flat">
+              <MessageContent className="bg-transparent border-0 px-0 py-0">
                 <Shimmer>Researching legal sources…</Shimmer>
               </MessageContent>
             </Message>
