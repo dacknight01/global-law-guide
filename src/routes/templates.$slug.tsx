@@ -13,8 +13,10 @@ import { createThread } from "@/lib/threads.functions";
 const PENDING_KEY = "dlaw:pending";
 const BASE_URL = "https://global-law-guide.lovable.app";
 
+import type { LegalTemplate } from "@/lib/dlaw-templates";
+
 export const Route = createFileRoute("/templates/$slug")({
-  loader: ({ params }) => {
+  loader: ({ params }): LegalTemplate => {
     const t = getTemplate(params.slug);
     if (!t) throw notFound();
     return t;
