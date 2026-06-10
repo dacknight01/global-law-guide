@@ -381,8 +381,10 @@ function ChatInner({
       </Conversation>
 
       <div className="border-t border-border bg-background">
-        <div className="max-w-3xl mx-auto w-full p-3">
+        <div className="max-w-3xl mx-auto w-full p-3 space-y-2">
+          <SelectorsBar value={sel} onChange={onSelChange} />
           <PromptInput
+
             onSubmit={(message) => {
               const text = message.text.trim();
               if (!text || isBusy) return;
