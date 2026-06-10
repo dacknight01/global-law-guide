@@ -20,12 +20,27 @@ export const Route = createFileRoute("/")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "D-Law AI — Global Legal Information Assistant" },
+      { title: "D-Law AI — Ask about any law, anywhere" },
       {
         name: "description",
         content:
           "Ask D-Law AI about laws in any of 195 countries. Pick a country and legal category, then get clear, neutral legal information in plain language.",
       },
+      { property: "og:title", content: "D-Law AI — Ask about any law, anywhere" },
+      {
+        property: "og:description",
+        content:
+          "Pick a country and legal category, then ask D-Law AI a question. Clear, neutral legal information from 195 countries.",
+      },
+      { property: "og:url", content: "https://global-law-guide.lovable.app/" },
+      { name: "twitter:title", content: "D-Law AI — Ask about any law, anywhere" },
+      {
+        name: "twitter:description",
+        content: "Clear, neutral legal information from 195 countries — in plain language.",
+      },
+    ],
+    links: [
+      { rel: "canonical", href: "https://global-law-guide.lovable.app/" },
     ],
   }),
   component: Landing,
@@ -173,7 +188,7 @@ function Landing() {
             <Globe className="h-3.5 w-3.5" /> 195 countries · neutral · plain language
           </div>
           <h1 className="mt-4 text-3xl sm:text-4xl font-bold tracking-tight">
-            Ask about any law, anywhere.
+            D-Law AI — Ask about any law, anywhere.
           </h1>
           <p className="mt-3 text-muted-foreground max-w-xl mx-auto">
             Pick a country and legal category, then ask your question. D-Law AI gives clear,
@@ -188,6 +203,7 @@ function Landing() {
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="e.g. What are the visa requirements for remote workers?"
+            aria-label="Your legal question"
             rows={3}
             className="resize-none"
             onKeyDown={(e) => {

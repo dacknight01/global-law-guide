@@ -229,7 +229,7 @@ export function ChatPage({ threadId }: { threadId: string }) {
       {/* Main */}
       <main className="flex-1 flex flex-col min-w-0">
         <header className="md:hidden flex items-center gap-2 p-3 border-b border-border">
-          <button onClick={() => setSidebarOpen((v) => !v)} aria-label="Menu" className="p-2 -ml-2 rounded hover:bg-accent">
+          <button onClick={() => setSidebarOpen((v) => !v)} aria-label="Toggle conversations sidebar" className="p-2 -ml-2 rounded hover:bg-accent">
             <Menu className="h-5 w-5" />
           </button>
           <img src={logo} alt="" width={24} height={24} className="rounded" />
@@ -397,6 +397,7 @@ function ChatInner({
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask about a law in any country… (e.g. 'Speeding fines in France')"
+              aria-label="Ask D-Law AI a legal question"
             />
             <PromptInputFooter className="justify-between">
               <div className="flex items-center gap-1 text-xs text-muted-foreground">

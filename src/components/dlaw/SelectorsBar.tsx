@@ -40,7 +40,7 @@ export function SelectorsBar({
           value={value.country}
           onValueChange={(v) => onChange({ ...value, country: v })}
         >
-          <SelectTrigger className="h-9 w-[170px] sm:w-[200px]">
+          <SelectTrigger aria-label="Select country" className="h-9 w-[170px] sm:w-[200px]">
             <SelectValue placeholder="Country" />
           </SelectTrigger>
           <SelectContent className="max-h-72">
@@ -56,6 +56,7 @@ export function SelectorsBar({
             value={value.customCountry}
             onChange={(e) => onChange({ ...value, customCountry: e.target.value })}
             placeholder="Type country / region"
+            aria-label="Custom country or region"
             className="h-9 w-[160px]"
           />
         )}
@@ -67,7 +68,7 @@ export function SelectorsBar({
           value={value.category}
           onValueChange={(v) => onChange({ ...value, category: v })}
         >
-          <SelectTrigger className="h-9 w-[180px] sm:w-[220px]">
+          <SelectTrigger aria-label="Select legal category" className="h-9 w-[180px] sm:w-[220px]">
             <SelectValue placeholder="Legal category" />
           </SelectTrigger>
           <SelectContent className="max-h-72">
