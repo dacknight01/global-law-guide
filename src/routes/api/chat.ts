@@ -4,13 +4,19 @@ import { createFileRoute } from "@tanstack/react-router";
 import { convertToModelMessages, streamText, type UIMessage } from "ai";
 import { createClient } from "@supabase/supabase-js";
 
-type ChatRequestBody = { messages?: unknown; threadId?: string };
+type ChatRequestBody = {
+  messages?: unknown;
+  threadId?: string;
+  country?: string;
+  category?: string;
+};
 
 export const Route = createFileRoute("/api/chat")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const { messages, threadId } = (await request.json()) as ChatRequestBody;
+        const { messages, threadId, country, category } =
+          (await request.json()) as ChatRequestBody;
         if (!Array.isArray(messages)) {
           return new Response("Messages are required", { status: 400 });
         }
