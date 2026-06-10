@@ -97,7 +97,7 @@ export const Route = createFileRoute("/api/chat")({
           return new Response("Thread not found", { status: 404 });
         }
 
-        const uiMessages = messages as UIMessage[];
+        const uiMessages = messages as unknown as UIMessage[];
         const last = uiMessages[uiMessages.length - 1];
 
         // Persist incoming user message (latest only)
