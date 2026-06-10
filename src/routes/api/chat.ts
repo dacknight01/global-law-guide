@@ -1,27 +1,70 @@
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
 import { DLAW_SYSTEM_PROMPT } from "@/lib/dlaw-system-prompt";
+import {
+  COUNTRIES,
+  DEFAULT_CATEGORY,
+  DEFAULT_COUNTRY,
+  LEGAL_CATEGORIES,
+} from "@/lib/dlaw-options";
 import { createFileRoute } from "@tanstack/react-router";
 import { convertToModelMessages, streamText, type UIMessage } from "ai";
 import { createClient } from "@supabase/supabase-js";
+import { z } from "zod";
 
-type ChatRequestBody = {
-  messages?: unknown;
-  threadId?: string;
-  country?: string;
-  category?: string;
-};
+const MAX_MESSAGES = 50;
+const MAX_PARTS = 20;
+const MAX_TEXT_PER_PART = 4000;
+const MAX_TOTAL_TEXT = 20000;
+
+const textPartSchema = z.object({
+  type: z.literal("text"),
+  text: z.string().max(MAX_TEXT_PER_PART),
+}).passthrough();
+
+const otherPartSchema = z.object({
+  type: z.string().max(40),
+}).passthrough();
+
+const messageSchema = z.object({
+  id: z.string().max(100).optional(),
+  role: z.enum(["user", "assistant"]),
+  parts: z.array(z.union([textPartSchema, otherPartSchema])).min(1).max(MAX_PARTS),
+}).passthrough();
+
+const COUNTRY_SET = new Set<string>(COUNTRIES as readonly string[]);
+const CATEGORY_SET = new Set<string>(LEGAL_CATEGORIES as readonly string[]);
+
+const bodySchema = z.object({
+  threadId: z.string().uuid(),
+  country: z.string().trim().max(80).optional(),
+  category: z.string().trim().max(80).optional(),
+  messages: z.array(messageSchema).min(1).max(MAX_MESSAGES),
+});
 
 export const Route = createFileRoute("/api/chat")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const { messages, threadId, country, category } =
-          (await request.json()) as ChatRequestBody;
-        if (!Array.isArray(messages)) {
-          return new Response("Messages are required", { status: 400 });
+        let parsed;
+        try {
+          parsed = bodySchema.parse(await request.json());
+        } catch {
+          return new Response("Invalid request", { status: 400 });
         }
-        if (!threadId || typeof threadId !== "string") {
-          return new Response("threadId is required", { status: 400 });
+        const { threadId, country, category, messages } = parsed;
+
+        // Enforce total combined text cap
+        const totalText = messages.reduce(
+          (sum, m) =>
+            sum +
+            m.parts.reduce(
+              (s, p) => s + (p.type === "text" ? (p as { text: string }).text.length : 0),
+              0,
+            ),
+          0,
+        );
+        if (totalText > MAX_TOTAL_TEXT) {
+          return new Response("Invalid request", { status: 400 });
         }
 
         const authHeader = request.headers.get("authorization");
