@@ -77,6 +77,28 @@ export function ChatPage({ threadId }: { threadId: string }) {
   const [threads, setThreads] = useState<ThreadRow[]>([]);
   const [initialMessages, setInitialMessages] = useState<UIMessage[] | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sel, setSel] = useState<SelectorsValue>({
+    country: DEFAULT_COUNTRY,
+    customCountry: "",
+    category: DEFAULT_CATEGORY,
+  });
+  const [pending, setPending] = useState<Pending | null>(null);
+
+  // Hydrate pending question (passed in from landing page) once per mount
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem(PENDING_KEY);
+      if (raw) {
+        const p = JSON.parse(raw) as Pending;
+        sessionStorage.removeItem(PENDING_KEY);
+        if (p.country) setSel((s) => ({ ...s, country: p.country!, customCountry: "" }));
+        if (p.category) setSel((s) => ({ ...s, category: p.category! }));
+        if (p.text) setPending(p);
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
 
   // Load thread list
   useEffect(() => {
@@ -104,14 +126,17 @@ export function ChatPage({ threadId }: { threadId: string }) {
       });
   }, [threadId, fetchMessages]);
 
+  const country = resolveCountry(sel);
+  const category = sel.category;
+
   const transport = useMemo(
     () =>
       new DefaultChatTransport({
         api: "/api/chat",
         headers: () => (token ? ({ Authorization: `Bearer ${token}` } as Record<string, string>) : ({} as Record<string, string>)),
-        body: { threadId },
+        body: { threadId, country, category },
       }),
-    [token, threadId],
+    [token, threadId, country, category],
   );
 
   const ready = initialMessages !== null && token !== null;
