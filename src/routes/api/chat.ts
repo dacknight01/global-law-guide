@@ -90,11 +90,14 @@ export const Route = createFileRoute("/api/chat")({
         const gateway = createLovableAiGatewayProvider(key);
         const model = gateway("google/gemini-3-flash-preview");
 
+        const selectedCountry = (country ?? "").trim() || "Global / International";
+        const selectedCategory = (category ?? "").trim() || "Any / General";
+        const contextPreamble = `\n\nUSER SELECTION (treat as primary jurisdiction & topic unless the user explicitly overrides in their message):\n- Country / Jurisdiction: ${selectedCountry}\n- Legal Category: ${selectedCategory}\n\nWhen relevant, set the response header to "📍 Country: ${selectedCountry}" and "⚖️ Legal Category: ${selectedCategory}". If the question is clearly about a different country/category, follow the user's wording instead and note the change.`;
+
         const result = streamText({
           model,
-          system: DLAW_SYSTEM_PROMPT,
+          system: DLAW_SYSTEM_PROMPT + contextPreamble,
           messages: await convertToModelMessages(uiMessages),
-
         });
 
         return result.toUIMessageStreamResponse({
