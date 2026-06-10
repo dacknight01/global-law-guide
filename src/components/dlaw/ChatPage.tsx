@@ -30,6 +30,15 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Plus, Trash2, LogOut, Menu, Scale } from "lucide-react";
 import logo from "@/assets/dlaw-logo.png";
+import {
+  SelectorsBar,
+  resolveCountry,
+  type SelectorsValue,
+} from "@/components/dlaw/SelectorsBar";
+import { DEFAULT_CATEGORY, DEFAULT_COUNTRY } from "@/lib/dlaw-options";
+
+const PENDING_KEY = "dlaw:pending";
+type Pending = { country?: string; category?: string; text?: string };
 
 type ThreadRow = {
   id: string;
