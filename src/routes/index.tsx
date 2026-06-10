@@ -140,10 +140,18 @@ function Landing() {
         </Link>
         <nav className="flex items-center gap-2">
           {authed ? (
-            <Button asChild variant="ghost">
-              <Link to="/chat/$threadId" params={{ threadId: "new" }} onClick={(e) => { e.preventDefault(); navigate({ to: "/" }); }}>
-                My chats
-              </Link>
+            <Button
+              variant="ghost"
+              onClick={async () => {
+                try {
+                  const t = await create();
+                  navigate({ to: "/chat/$threadId", params: { threadId: t.id } });
+                } catch (e) {
+                  toast.error(e instanceof Error ? e.message : "Failed");
+                }
+              }}
+            >
+              Open chats
             </Button>
           ) : null}
           {authed === false && (
