@@ -268,10 +268,18 @@ function ChatInner({
   threadId,
   initialMessages,
   transport,
+  sel,
+  onSelChange,
+  pending,
+  onPendingConsumed,
 }: {
   threadId: string;
   initialMessages: UIMessage[];
   transport: DefaultChatTransport<UIMessage>;
+  sel: SelectorsValue;
+  onSelChange: (v: SelectorsValue) => void;
+  pending: Pending | null;
+  onPendingConsumed: () => void;
 }) {
   const { messages, sendMessage, status, error } = useChat({
     id: threadId,
@@ -288,6 +296,21 @@ function ChatInner({
   }, [threadId, status]);
 
   const isBusy = status === "submitted" || status === "streaming";
+
+  // Auto-send a pending question (e.g. coming from the public landing page).
+  const autoSentRef = useRef(false);
+  useEffect(() => {
+    if (autoSentRef.current) return;
+    if (!pending?.text) return;
+    if (messages.length > 0) {
+      autoSentRef.current = true;
+      onPendingConsumed();
+      return;
+    }
+    autoSentRef.current = true;
+    sendMessage({ text: pending.text });
+    onPendingConsumed();
+  }, [pending, messages.length, sendMessage, onPendingConsumed]);
 
   return (
     <>
