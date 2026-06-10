@@ -2,9 +2,10 @@
 
 > Global legal information assistant. Ask about laws in any of 195 countries and get clear, neutral, plain-language explanations — for educational purposes, not legal advice.
 
-D-Law AI lets users pick a country and legal category, then ask a question. Answers are structured (summary, key rules, exceptions, references) and written for non-lawyers.
+D-Law AI lets users pick a country and legal category, then ask a question. Answers are structured (summary, key rules, exceptions, references) and written for non-lawyers. A library of legal document templates provides structured starters for common tasks.
 
 ## Pages
 
 - [Home](/): Pick a country and legal category, then ask D-Law AI a legal question.
+- [Templates](/templates): Library of common legal document templates — immigration letters, contract termination, NDAs, leases, wills, power of attorney, GDPR DPAs.
 - [Sign in](/auth): Sign in or create an account to start a conversation.
