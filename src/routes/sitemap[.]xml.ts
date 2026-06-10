@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
 
+import { TEMPLATES } from "@/lib/dlaw-templates";
+
 const BASE_URL = "https://global-law-guide.lovable.app";
 
 interface SitemapEntry {
@@ -15,6 +17,12 @@ export const Route = createFileRoute("/sitemap.xml")({
       GET: async () => {
         const entries: SitemapEntry[] = [
           { path: "/", changefreq: "weekly", priority: "1.0" },
+          { path: "/templates", changefreq: "weekly", priority: "0.8" },
+          ...TEMPLATES.map((t) => ({
+            path: `/templates/${t.slug}`,
+            changefreq: "monthly" as const,
+            priority: "0.7",
+          })),
           { path: "/auth", changefreq: "monthly", priority: "0.3" },
         ];
 
