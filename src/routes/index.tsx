@@ -20,12 +20,27 @@ export const Route = createFileRoute("/")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "D-Law AI — Global Legal Information Assistant" },
+      { title: "D-Law AI — Ask about any law, anywhere" },
       {
         name: "description",
         content:
           "Ask D-Law AI about laws in any of 195 countries. Pick a country and legal category, then get clear, neutral legal information in plain language.",
       },
+      { property: "og:title", content: "D-Law AI — Ask about any law, anywhere" },
+      {
+        property: "og:description",
+        content:
+          "Pick a country and legal category, then ask D-Law AI a question. Clear, neutral legal information from 195 countries.",
+      },
+      { property: "og:url", content: "https://global-law-guide.lovable.app/" },
+      { name: "twitter:title", content: "D-Law AI — Ask about any law, anywhere" },
+      {
+        name: "twitter:description",
+        content: "Clear, neutral legal information from 195 countries — in plain language.",
+      },
+    ],
+    links: [
+      { rel: "canonical", href: "https://global-law-guide.lovable.app/" },
     ],
   }),
   component: Landing,

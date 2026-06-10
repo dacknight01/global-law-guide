@@ -17,6 +17,21 @@ export const Route = createFileRoute("/auth")({
         name: "description",
         content: "Sign in to D-Law AI for clear, neutral legal information from 195 countries.",
       },
+      { property: "og:title", content: "Sign in — D-Law AI" },
+      {
+        property: "og:description",
+        content: "Sign in or create a free account to ask D-Law AI legal questions.",
+      },
+      { property: "og:url", content: "https://global-law-guide.lovable.app/auth" },
+      { name: "twitter:title", content: "Sign in — D-Law AI" },
+      {
+        name: "twitter:description",
+        content: "Sign in to start a conversation with D-Law AI.",
+      },
+      { name: "robots", content: "noindex" },
+    ],
+    links: [
+      { rel: "canonical", href: "https://global-law-guide.lovable.app/auth" },
     ],
   }),
   component: AuthPage,
