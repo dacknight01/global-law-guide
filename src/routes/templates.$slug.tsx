@@ -97,7 +97,7 @@ export const Route = createFileRoute("/templates/$slug")({
 });
 
 function TemplateDetail() {
-  const t = Route.useLoaderData();
+  const t: LegalTemplate = Route.useLoaderData();
   const navigate = useNavigate();
   const create = useServerFn(createThread);
   const [authed, setAuthed] = useState<boolean | null>(null);
