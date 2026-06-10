@@ -56,7 +56,27 @@ function Landing() {
   useEffect(() => {
     let mounted = true;
     supabase.auth.getUser().then(({ data }) => {
-      if (mounted) setAuthed(!!data.user);
+      if (!mounted) return;
+      setAuthed(!!data.user);
+      // If the user just signed in and has a pending question from before,
+      // create a thread and jump straight into it.
+      if (data.user) {
+        try {
+          const raw = sessionStorage.getItem(PENDING_KEY);
+          if (raw) {
+            const p = JSON.parse(raw) as { text?: string };
+            if (p.text) {
+              create()
+                .then((t) =>
+                  navigate({ to: "/chat/$threadId", params: { threadId: t.id } }),
+                )
+                .catch(() => {});
+            }
+          }
+        } catch {
+          // ignore
+        }
+      }
     });
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
       setAuthed(!!session?.user);
@@ -65,7 +85,7 @@ function Landing() {
       mounted = false;
       sub.subscription.unsubscribe();
     };
-  }, []);
+  }, [create, navigate]);
 
   async function ask(prefill?: { country?: string; category?: string; text?: string }) {
     const country = prefill?.country ?? resolveCountry(sel);
