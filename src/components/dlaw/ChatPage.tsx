@@ -241,6 +241,10 @@ export function ChatPage({ threadId }: { threadId: string }) {
             threadId={threadId}
             initialMessages={initialMessages}
             transport={transport}
+            sel={sel}
+            onSelChange={setSel}
+            pending={pending}
+            onPendingConsumed={() => setPending(null)}
           />
         ) : (
           <div className="flex-1 flex items-center justify-center text-muted-foreground">
