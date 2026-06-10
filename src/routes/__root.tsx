@@ -81,9 +81,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "description", content: "Clear, neutral legal information from 195 countries. D-Law AI explains laws in plain language — not a substitute for professional legal advice." },
       { name: "author", content: "D-Law" },
       { property: "og:title", content: "D-Law AI — Global Legal Information Assistant" },
-      { property: "og:description", content: "Clear, neutral legal information from 195 countries, in plain language." },
+      { property: "og:description", content: "Clear, neutral legal information from 195 countries. D-Law AI explains laws in plain language — not a substitute for professional legal advice." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "D-Law AI — Global Legal Information Assistant" },
+      { name: "twitter:description", content: "Clear, neutral legal information from 195 countries. D-Law AI explains laws in plain language — not a substitute for professional legal advice." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/58baf574-3d68-4970-9f1b-2dbaae5ec314" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/58baf574-3d68-4970-9f1b-2dbaae5ec314" },
     ],
     links: [
       {
