@@ -30,6 +30,15 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Plus, Trash2, LogOut, Menu, Scale } from "lucide-react";
 import logo from "@/assets/dlaw-logo.png";
+import {
+  SelectorsBar,
+  resolveCountry,
+  type SelectorsValue,
+} from "@/components/dlaw/SelectorsBar";
+import { DEFAULT_CATEGORY, DEFAULT_COUNTRY } from "@/lib/dlaw-options";
+
+const PENDING_KEY = "dlaw:pending";
+type Pending = { country?: string; category?: string; text?: string };
 
 type ThreadRow = {
   id: string;
@@ -68,6 +77,28 @@ export function ChatPage({ threadId }: { threadId: string }) {
   const [threads, setThreads] = useState<ThreadRow[]>([]);
   const [initialMessages, setInitialMessages] = useState<UIMessage[] | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sel, setSel] = useState<SelectorsValue>({
+    country: DEFAULT_COUNTRY,
+    customCountry: "",
+    category: DEFAULT_CATEGORY,
+  });
+  const [pending, setPending] = useState<Pending | null>(null);
+
+  // Hydrate pending question (passed in from landing page) once per mount
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem(PENDING_KEY);
+      if (raw) {
+        const p = JSON.parse(raw) as Pending;
+        sessionStorage.removeItem(PENDING_KEY);
+        if (p.country) setSel((s) => ({ ...s, country: p.country!, customCountry: "" }));
+        if (p.category) setSel((s) => ({ ...s, category: p.category! }));
+        if (p.text) setPending(p);
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
 
   // Load thread list
   useEffect(() => {
@@ -95,14 +126,17 @@ export function ChatPage({ threadId }: { threadId: string }) {
       });
   }, [threadId, fetchMessages]);
 
+  const country = resolveCountry(sel);
+  const category = sel.category;
+
   const transport = useMemo(
     () =>
       new DefaultChatTransport({
         api: "/api/chat",
         headers: () => (token ? ({ Authorization: `Bearer ${token}` } as Record<string, string>) : ({} as Record<string, string>)),
-        body: { threadId },
+        body: { threadId, country, category },
       }),
-    [token, threadId],
+    [token, threadId, country, category],
   );
 
   const ready = initialMessages !== null && token !== null;
@@ -207,6 +241,10 @@ export function ChatPage({ threadId }: { threadId: string }) {
             threadId={threadId}
             initialMessages={initialMessages}
             transport={transport}
+            sel={sel}
+            onSelChange={setSel}
+            pending={pending}
+            onPendingConsumed={() => setPending(null)}
           />
         ) : (
           <div className="flex-1 flex items-center justify-center text-muted-foreground">
@@ -230,10 +268,18 @@ function ChatInner({
   threadId,
   initialMessages,
   transport,
+  sel,
+  onSelChange,
+  pending,
+  onPendingConsumed,
 }: {
   threadId: string;
   initialMessages: UIMessage[];
   transport: DefaultChatTransport<UIMessage>;
+  sel: SelectorsValue;
+  onSelChange: (v: SelectorsValue) => void;
+  pending: Pending | null;
+  onPendingConsumed: () => void;
 }) {
   const { messages, sendMessage, status, error } = useChat({
     id: threadId,
@@ -250,6 +296,21 @@ function ChatInner({
   }, [threadId, status]);
 
   const isBusy = status === "submitted" || status === "streaming";
+
+  // Auto-send a pending question (e.g. coming from the public landing page).
+  const autoSentRef = useRef(false);
+  useEffect(() => {
+    if (autoSentRef.current) return;
+    if (!pending?.text) return;
+    if (messages.length > 0) {
+      autoSentRef.current = true;
+      onPendingConsumed();
+      return;
+    }
+    autoSentRef.current = true;
+    sendMessage({ text: pending.text });
+    onPendingConsumed();
+  }, [pending, messages.length, sendMessage, onPendingConsumed]);
 
   return (
     <>
@@ -320,8 +381,10 @@ function ChatInner({
       </Conversation>
 
       <div className="border-t border-border bg-background">
-        <div className="max-w-3xl mx-auto w-full p-3">
+        <div className="max-w-3xl mx-auto w-full p-3 space-y-2">
+          <SelectorsBar value={sel} onChange={onSelChange} />
           <PromptInput
+
             onSubmit={(message) => {
               const text = message.text.trim();
               if (!text || isBusy) return;
