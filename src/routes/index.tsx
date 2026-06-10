@@ -188,7 +188,7 @@ function Landing() {
             <Globe className="h-3.5 w-3.5" /> 195 countries · neutral · plain language
           </div>
           <h1 className="mt-4 text-3xl sm:text-4xl font-bold tracking-tight">
-            Ask about any law, anywhere.
+            D-Law AI — Ask about any law, anywhere.
           </h1>
           <p className="mt-3 text-muted-foreground max-w-xl mx-auto">
             Pick a country and legal category, then ask your question. D-Law AI gives clear,
@@ -203,6 +203,7 @@ function Landing() {
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="e.g. What are the visa requirements for remote workers?"
+            aria-label="Your legal question"
             rows={3}
             className="resize-none"
             onKeyDown={(e) => {
