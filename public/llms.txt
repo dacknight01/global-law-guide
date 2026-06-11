@@ -1,11 +1,7 @@
-# D-Law AI
+# D-Law — Global Law Guide
 
-> Global legal information assistant. Ask about laws in any of 195 countries and get clear, neutral, plain-language explanations — for educational purposes, not legal advice.
-
-D-Law AI lets users pick a country and legal category, then ask a question. Answers are structured (summary, key rules, exceptions, references) and written for non-lawyers. A library of legal document templates provides structured starters for common tasks.
+D-Law is an independent educational platform that simplifies public legal information into a scrollable feed of plain-language law cards. It is not affiliated with any government or legal authority.
 
 ## Pages
-
-- [Home](/): Pick a country and legal category, then ask D-Law AI a legal question.
-- [Templates](/templates): Library of common legal document templates — immigration letters, contract termination, NDAs, leases, wills, power of attorney, GDPR DPAs.
-- [Sign in](/auth): Sign in or create an account to start a conversation.
+- / — Home feed of law cards, filterable by country and category, with search.
+- /card/{slug} — Full explanation of an individual law card.

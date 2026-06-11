@@ -9,32 +9,13 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TemplatesRouteImport } from './routes/templates'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as TemplatesSlugRouteImport } from './routes/templates.$slug'
-import { Route as ApiChatRouteImport } from './routes/api/chat'
-import { Route as AuthenticatedChatThreadIdRouteImport } from './routes/_authenticated/chat.$threadId'
+import { Route as CardSlugRouteImport } from './routes/card.$slug'
 
-const TemplatesRoute = TemplatesRouteImport.update({
-  id: '/templates',
-  path: '/templates',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
-  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -42,120 +23,49 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TemplatesSlugRoute = TemplatesSlugRouteImport.update({
-  id: '/$slug',
-  path: '/$slug',
-  getParentRoute: () => TemplatesRoute,
-} as any)
-const ApiChatRoute = ApiChatRouteImport.update({
-  id: '/api/chat',
-  path: '/api/chat',
+const CardSlugRoute = CardSlugRouteImport.update({
+  id: '/card/$slug',
+  path: '/card/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedChatThreadIdRoute =
-  AuthenticatedChatThreadIdRouteImport.update({
-    id: '/chat/$threadId',
-    path: '/chat/$threadId',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/templates': typeof TemplatesRouteWithChildren
-  '/api/chat': typeof ApiChatRoute
-  '/templates/$slug': typeof TemplatesSlugRoute
-  '/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
+  '/card/$slug': typeof CardSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/templates': typeof TemplatesRouteWithChildren
-  '/api/chat': typeof ApiChatRoute
-  '/templates/$slug': typeof TemplatesSlugRoute
-  '/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
+  '/card/$slug': typeof CardSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
-  '/auth': typeof AuthRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/templates': typeof TemplatesRouteWithChildren
-  '/api/chat': typeof ApiChatRoute
-  '/templates/$slug': typeof TemplatesSlugRoute
-  '/_authenticated/chat/$threadId': typeof AuthenticatedChatThreadIdRoute
+  '/card/$slug': typeof CardSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/auth'
-    | '/sitemap.xml'
-    | '/templates'
-    | '/api/chat'
-    | '/templates/$slug'
-    | '/chat/$threadId'
+  fullPaths: '/' | '/sitemap.xml' | '/card/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/auth'
-    | '/sitemap.xml'
-    | '/templates'
-    | '/api/chat'
-    | '/templates/$slug'
-    | '/chat/$threadId'
-  id:
-    | '__root__'
-    | '/'
-    | '/_authenticated'
-    | '/auth'
-    | '/sitemap.xml'
-    | '/templates'
-    | '/api/chat'
-    | '/templates/$slug'
-    | '/_authenticated/chat/$threadId'
+  to: '/' | '/sitemap.xml' | '/card/$slug'
+  id: '__root__' | '/' | '/sitemap.xml' | '/card/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
-  AuthRoute: typeof AuthRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
-  TemplatesRoute: typeof TemplatesRouteWithChildren
-  ApiChatRoute: typeof ApiChatRoute
+  CardSlugRoute: typeof CardSlugRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/templates': {
-      id: '/templates'
-      path: '/templates'
-      fullPath: '/templates'
-      preLoaderRoute: typeof TemplatesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated': {
-      id: '/_authenticated'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -165,71 +75,21 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/templates/$slug': {
-      id: '/templates/$slug'
-      path: '/$slug'
-      fullPath: '/templates/$slug'
-      preLoaderRoute: typeof TemplatesSlugRouteImport
-      parentRoute: typeof TemplatesRoute
-    }
-    '/api/chat': {
-      id: '/api/chat'
-      path: '/api/chat'
-      fullPath: '/api/chat'
-      preLoaderRoute: typeof ApiChatRouteImport
+    '/card/$slug': {
+      id: '/card/$slug'
+      path: '/card/$slug'
+      fullPath: '/card/$slug'
+      preLoaderRoute: typeof CardSlugRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/chat/$threadId': {
-      id: '/_authenticated/chat/$threadId'
-      path: '/chat/$threadId'
-      fullPath: '/chat/$threadId'
-      preLoaderRoute: typeof AuthenticatedChatThreadIdRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
     }
   }
 }
 
-interface AuthenticatedRouteRouteChildren {
-  AuthenticatedChatThreadIdRoute: typeof AuthenticatedChatThreadIdRoute
-}
-
-const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
-  AuthenticatedChatThreadIdRoute: AuthenticatedChatThreadIdRoute,
-}
-
-const AuthenticatedRouteRouteWithChildren =
-  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
-
-interface TemplatesRouteChildren {
-  TemplatesSlugRoute: typeof TemplatesSlugRoute
-}
-
-const TemplatesRouteChildren: TemplatesRouteChildren = {
-  TemplatesSlugRoute: TemplatesSlugRoute,
-}
-
-const TemplatesRouteWithChildren = TemplatesRoute._addFileChildren(
-  TemplatesRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
-  AuthRoute: AuthRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
-  TemplatesRoute: TemplatesRouteWithChildren,
-  ApiChatRoute: ApiChatRoute,
+  CardSlugRoute: CardSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

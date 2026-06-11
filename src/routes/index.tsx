@@ -1,271 +1,154 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useRef, useState } from "react";
-import { Globe, ArrowRight, ShieldCheck, Scale, Languages } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { Search, ShieldCheck, Globe2 } from "lucide-react";
 
-import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { toast } from "sonner";
 import logo from "@/assets/dlaw-logo.png";
-import {
-  SelectorsBar,
-  resolveCountry,
-  type SelectorsValue,
-} from "@/components/dlaw/SelectorsBar";
-import { DEFAULT_CATEGORY, DEFAULT_COUNTRY } from "@/lib/dlaw-options";
-import { createThread } from "@/lib/threads.functions";
+import { Filters } from "@/components/dlaw/Filters";
+import { LawCard, LawCardSkeleton } from "@/components/dlaw/LawCard";
+import { DEFAULT_CATEGORY, DEFAULT_COUNTRY, DISCLAIMER } from "@/lib/dlaw-filters";
+import { getFeed } from "@/lib/law-cards.functions";
 
 export const Route = createFileRoute("/")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "D-Law AI — Ask about any law, anywhere" },
+      { title: "D-Law — Global Law Guide: scroll laws like a feed" },
       {
         name: "description",
         content:
-          "Ask D-Law AI about laws in any of 195 countries. Pick a country and legal category, then get clear, neutral legal information in plain language.",
+          "D-Law is an independent educational feed of plain-language law cards. Browse housing, work, police, family and more by country.",
       },
-      { property: "og:title", content: "D-Law AI — Ask about any law, anywhere" },
+      { property: "og:title", content: "D-Law — Global Law Guide" },
       {
         property: "og:description",
-        content:
-          "Pick a country and legal category, then ask D-Law AI a question. Clear, neutral legal information from 195 countries.",
+        content: "Scrollable, plain-language law cards by country and category.",
       },
       { property: "og:url", content: "https://global-law-guide.lovable.app/" },
-      { name: "twitter:title", content: "D-Law AI — Ask about any law, anywhere" },
+      { name: "twitter:title", content: "D-Law — Global Law Guide" },
       {
         name: "twitter:description",
-        content: "Clear, neutral legal information from 195 countries — in plain language.",
+        content: "Scrollable, plain-language law cards by country and category.",
       },
     ],
-    links: [
-      { rel: "canonical", href: "https://global-law-guide.lovable.app/" },
-    ],
+    links: [{ rel: "canonical", href: "https://global-law-guide.lovable.app/" }],
   }),
-  component: Landing,
+  component: Feed,
 });
 
-const PENDING_KEY = "dlaw:pending";
+function Feed() {
+  const [country, setCountry] = useState(DEFAULT_COUNTRY);
+  const [category, setCategory] = useState(DEFAULT_CATEGORY);
+  const [searchInput, setSearchInput] = useState("");
+  const [activeQuery, setActiveQuery] = useState("");
 
-const SUGGESTIONS = [
-  { country: "Germany", category: "Traffic & Road Law", text: "What are the penalties for drunk driving?" },
-  { country: "United States", category: "Property & Real Estate Law", text: "Explain tenant rights for renters." },
-  { country: "Japan", category: "Family Law", text: "How does inheritance work?" },
-  { country: "European Union", category: "Data Privacy Law", text: "Summarize GDPR for small businesses." },
-];
-
-function Landing() {
-  const navigate = useNavigate();
-  const create = useServerFn(createThread);
-  const [authed, setAuthed] = useState<boolean | null>(null);
-  const [submitting, setSubmitting] = useState(false);
-  const [text, setText] = useState("");
-  const [sel, setSel] = useState<SelectorsValue>({
-    country: DEFAULT_COUNTRY,
-    customCountry: "",
-    category: DEFAULT_CATEGORY,
+  const fetchFeed = useServerFn(getFeed);
+  const { data, isFetching, isError, refetch } = useQuery({
+    queryKey: ["feed", country, category, activeQuery],
+    queryFn: () =>
+      fetchFeed({
+        data: { country, category, query: activeQuery || undefined, limit: 12 },
+      }),
+    staleTime: 60_000,
   });
-  const textRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    let mounted = true;
-    supabase.auth.getUser().then(({ data }) => {
-      if (!mounted) return;
-      setAuthed(!!data.user);
-      // If the user just signed in and has a pending question from before,
-      // create a thread and jump straight into it.
-      if (data.user) {
-        try {
-          const raw = sessionStorage.getItem(PENDING_KEY);
-          if (raw) {
-            const p = JSON.parse(raw) as { text?: string };
-            if (p.text) {
-              create()
-                .then((t) =>
-                  navigate({ to: "/chat/$threadId", params: { threadId: t.id } }),
-                )
-                .catch(() => {});
-            }
-          }
-        } catch {
-          // ignore
-        }
-      }
-    });
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
-      setAuthed(!!session?.user);
-    });
-    return () => {
-      mounted = false;
-      sub.subscription.unsubscribe();
-    };
-  }, [create, navigate]);
+    document.documentElement.classList.add("dark-supported");
+  }, []);
 
-  async function ask(prefill?: { country?: string; category?: string; text?: string }) {
-    const country = prefill?.country ?? resolveCountry(sel);
-    const category = prefill?.category ?? sel.category;
-    const message = (prefill?.text ?? text).trim();
-
-    if (!message) {
-      toast.error("Type your legal question first.");
-      textRef.current?.focus();
-      return;
-    }
-
-    if (!authed) {
-      try {
-        sessionStorage.setItem(
-          PENDING_KEY,
-          JSON.stringify({ country, category, text: message }),
-        );
-      } catch {
-        // ignore storage errors
-      }
-      toast.message("Sign in to ask D-Law AI", {
-        description: "We'll bring your question along after you sign in.",
-      });
-      navigate({ to: "/auth" });
-      return;
-    }
-
-    setSubmitting(true);
-    try {
-      const t = await create();
-      sessionStorage.setItem(
-        PENDING_KEY,
-        JSON.stringify({ country, category, text: message }),
-      );
-      navigate({ to: "/chat/$threadId", params: { threadId: t.id } });
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Could not start a conversation");
-      setSubmitting(false);
-    }
-  }
+  const submitSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    setActiveQuery(searchInput.trim());
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/30 text-foreground">
-      <header className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
-          <img src={logo} alt="D-Law AI" width={36} height={36} className="rounded-lg" />
-          <div>
-            <div className="font-semibold leading-tight">D-Law AI</div>
-            <div className="text-[11px] text-muted-foreground leading-tight">Global legal info</div>
+    <div className="min-h-screen bg-background text-foreground">
+      <header className="sticky top-0 z-20 border-b border-border bg-background/85 backdrop-blur">
+        <div className="max-w-2xl mx-auto px-4 py-3">
+          <div className="flex items-center justify-between gap-3 mb-3">
+            <Link to="/" className="flex items-center gap-2">
+              <img src={logo} alt="D-Law" width={32} height={32} className="rounded-lg" />
+              <div>
+                <div className="font-bold leading-tight">D-Law</div>
+                <div className="text-[10px] text-muted-foreground leading-tight">
+                  Global Law Guide
+                </div>
+              </div>
+            </Link>
+            <span className="inline-flex items-center gap-1 rounded-full border border-border px-2 py-0.5 text-[11px] text-muted-foreground">
+              <Globe2 className="h-3 w-3" /> Educational only
+            </span>
           </div>
-        </Link>
-        <nav className="flex items-center gap-2">
-          {authed ? (
-            <Button
-              variant="ghost"
-              onClick={async () => {
-                try {
-                  const t = await create();
-                  navigate({ to: "/chat/$threadId", params: { threadId: t.id } });
-                } catch (e) {
-                  toast.error(e instanceof Error ? e.message : "Failed");
-                }
-              }}
-            >
-              Open chats
-            </Button>
-          ) : null}
-          {authed === false && (
-            <>
-              <Button asChild variant="ghost">
-                <Link to="/auth">Sign in</Link>
-              </Button>
-              <Button asChild>
-                <Link to="/auth">Get started</Link>
-              </Button>
-            </>
-          )}
-        </nav>
+          <form onSubmit={submitSearch} className="relative mb-3">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <input
+              type="search"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              placeholder="Search laws e.g. 'tenant rights Nigeria'"
+              aria-label="Search laws"
+              maxLength={200}
+              className="w-full rounded-lg border border-border bg-card pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+          </form>
+          <Filters
+            country={country}
+            category={category}
+            onCountryChange={setCountry}
+            onCategoryChange={setCategory}
+          />
+        </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-4 pt-6 pb-20">
-        <section className="text-center mb-8">
-          <div className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1 text-xs text-muted-foreground">
-            <Globe className="h-3.5 w-3.5" /> 195 countries · neutral · plain language
+      <main className="max-w-2xl mx-auto px-4 py-5">
+        <h1 className="sr-only">D-Law — Global Law Guide feed</h1>
+        {activeQuery && (
+          <div className="mb-3 flex items-center justify-between text-sm">
+            <span className="text-muted-foreground">
+              Results for "<span className="text-foreground font-medium">{activeQuery}</span>"
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                setActiveQuery("");
+                setSearchInput("");
+              }}
+              className="text-primary hover:underline"
+            >
+              Clear
+            </button>
           </div>
-          <h1 className="mt-4 text-3xl sm:text-4xl font-bold tracking-tight">
-            D-Law AI — Ask about any law, anywhere.
-          </h1>
-          <p className="mt-3 text-muted-foreground max-w-xl mx-auto">
-            Pick a country and legal category, then ask your question. D-Law AI gives clear,
-            structured legal information — not legal advice.
-          </p>
-        </section>
+        )}
 
-        <section className="rounded-2xl border border-border bg-card p-4 sm:p-5 shadow-sm">
-          <SelectorsBar value={sel} onChange={setSel} className="mb-3" />
-          <Textarea
-            ref={textRef}
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder="e.g. What are the visa requirements for remote workers?"
-            aria-label="Your legal question"
-            rows={3}
-            className="resize-none"
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
-                e.preventDefault();
-                ask();
-              }
-            }}
-          />
-          <div className="mt-3 flex items-center justify-between gap-2">
-            <div className="text-xs text-muted-foreground flex items-center gap-1">
-              <ShieldCheck className="h-3.5 w-3.5" /> Information only — not legal advice
-            </div>
-            <Button onClick={() => ask()} disabled={submitting}>
-              {authed === false ? "Sign in & ask" : "Ask D-Law AI"}
-              <ArrowRight className="h-4 w-4" />
-            </Button>
+        {isError && (
+          <div className="rounded-xl border border-destructive/40 bg-destructive/10 p-4 text-sm">
+            Couldn't load the feed.{" "}
+            <button onClick={() => refetch()} className="underline font-medium">
+              Retry
+            </button>
           </div>
-        </section>
+        )}
 
-        <section className="mt-6">
-          <div className="text-xs uppercase tracking-wide text-muted-foreground mb-2">
-            Try an example
+        <div className="space-y-4">
+          {isFetching && !data
+            ? Array.from({ length: 4 }).map((_, i) => <LawCardSkeleton key={i} />)
+            : (data ?? []).map((card) => <LawCard key={card.id} card={card} />)}
+        </div>
+
+        {!isFetching && data && data.length === 0 && (
+          <div className="rounded-xl border border-border bg-card p-6 text-center text-sm text-muted-foreground">
+            No cards yet for this filter. Try another country or category.
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {SUGGESTIONS.map((s) => (
-              <button
-                key={s.text}
-                onClick={() => {
-                  setSel({ country: s.country, customCountry: "", category: s.category });
-                  setText(s.text);
-                  setTimeout(() => textRef.current?.focus(), 0);
-                }}
-                className="text-left rounded-lg border border-border bg-card hover:bg-accent transition p-3 text-sm"
-              >
-                <div className="text-xs text-muted-foreground mb-1">
-                  {s.country} · {s.category}
-                </div>
-                {s.text}
-              </button>
-            ))}
+        )}
+
+        <footer className="mt-10 pt-6 border-t border-border text-center text-xs text-muted-foreground space-y-2">
+          <div className="flex items-center justify-center gap-1.5">
+            <ShieldCheck className="h-3.5 w-3.5" />
+            <span>Information only — not legal advice.</span>
           </div>
-        </section>
-
-        <section className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {[
-            { icon: Globe, title: "195 countries", body: "Common, civil, mixed and Sharia-based systems." },
-            { icon: Scale, title: "Structured answers", body: "Summary, key rules, exceptions and references." },
-            { icon: Languages, title: "Plain language", body: "Designed for non-lawyers. ELI12 mode supported." },
-          ].map(({ icon: Icon, title, body }) => (
-            <div key={title} className="rounded-xl border border-border bg-card p-4">
-              <Icon className="h-5 w-5 text-primary" />
-              <div className="mt-2 font-medium">{title}</div>
-              <div className="text-sm text-muted-foreground">{body}</div>
-            </div>
-          ))}
-        </section>
-
-        <p className="mt-10 text-center text-xs text-muted-foreground">
-          D-Law provides legal information for educational purposes only. This does not replace
-          professional legal advice.
-        </p>
+          <p className="max-w-md mx-auto">{DISCLAIMER}</p>
+        </footer>
       </main>
     </div>
   );
