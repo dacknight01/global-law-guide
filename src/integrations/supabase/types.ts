@@ -14,62 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
-      messages: {
+      law_cards: {
         Row: {
+          category: string
+          country: string
           created_at: string
+          full_explanation: string
           id: string
-          parts: Json
-          role: string
-          thread_id: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          parts?: Json
-          role: string
-          thread_id: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          parts?: Json
-          role?: string
-          thread_id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "messages_thread_id_fkey"
-            columns: ["thread_id"]
-            isOneToOne: false
-            referencedRelation: "threads"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      threads: {
-        Row: {
-          created_at: string
-          id: string
+          rights: string
+          search_terms: string
+          slug: string
+          summary: string
           title: string
-          updated_at: string
-          user_id: string
+          what_to_do: string
         }
         Insert: {
+          category: string
+          country: string
           created_at?: string
+          full_explanation: string
           id?: string
-          title?: string
-          updated_at?: string
-          user_id: string
+          rights: string
+          search_terms?: string
+          slug: string
+          summary: string
+          title: string
+          what_to_do: string
         }
         Update: {
+          category?: string
+          country?: string
           created_at?: string
+          full_explanation?: string
           id?: string
+          rights?: string
+          search_terms?: string
+          slug?: string
+          summary?: string
           title?: string
-          updated_at?: string
-          user_id?: string
+          what_to_do?: string
         }
         Relationships: []
       }
