@@ -124,7 +124,11 @@ function Feed() {
         {isError && (
           <div className="rounded-xl border border-destructive/40 bg-destructive/10 p-4 text-sm">
             Couldn't load the feed.{" "}
-            <button onClick={() => refetch()} className="underline font-medium">
+            <button
+              onClick={() => refetch()}
+              aria-label="Retry loading the law feed"
+              className="underline font-medium"
+            >
               Retry
             </button>
           </div>
