@@ -18,17 +18,41 @@ export const Route = createFileRoute("/card/$slug")({
     if (!card) throw notFound();
     return { card };
   },
-  head: ({ loaderData }) => {
+  head: ({ params, loaderData }) => {
     const card = (loaderData as { card: FullCard } | undefined)?.card;
     const title = card ? `${card.title} — D-Law` : "Law card — D-Law";
-    const desc = card?.summary ?? "Plain-language legal information.";
+    const baseDesc = card?.summary ?? "Plain-language legal information from D-Law.";
+    const desc =
+      baseDesc.length < 50
+        ? `${baseDesc} Plain-language legal information from D-Law.`.slice(0, 160)
+        : baseDesc.slice(0, 160);
+    const url = `https://global-law-guide.lovable.app/card/${params.slug}`;
     return {
       meta: [
         { title },
-        { name: "description", content: desc.slice(0, 160) },
+        { name: "description", content: desc },
         { property: "og:title", content: title },
-        { property: "og:description", content: desc.slice(0, 200) },
+        { property: "og:description", content: desc },
+        { property: "og:url", content: url },
+        { property: "og:type", content: "article" },
       ],
+      links: [{ rel: "canonical", href: url }],
+      scripts: card
+        ? [
+            {
+              type: "application/ld+json",
+              children: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "Article",
+                headline: card.title,
+                description: card.summary,
+                author: { "@type": "Organization", name: "D-Law" },
+                publisher: { "@type": "Organization", name: "D-Law" },
+                url,
+              }),
+            },
+          ]
+        : [],
     };
   },
   component: CardPage,
