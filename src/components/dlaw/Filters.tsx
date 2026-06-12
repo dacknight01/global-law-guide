@@ -33,8 +33,10 @@ export function Filters({ country, category, onCountryChange, onCategoryChange }
             return (
               <button
                 key={cat.code}
+                type="button"
                 role="tab"
                 aria-selected={active}
+                aria-label={`Filter by ${cat.name}`}
                 onClick={() => onCategoryChange(cat.code)}
                 className={cn(
                   "shrink-0 rounded-full border px-3.5 py-1.5 text-sm transition-colors",
@@ -43,7 +45,7 @@ export function Filters({ country, category, onCountryChange, onCategoryChange }
                     : "bg-card text-foreground border-border hover:bg-accent",
                 )}
               >
-                <span className="mr-1">{cat.emoji}</span>
+                <span className="mr-1" aria-hidden="true">{cat.emoji}</span>
                 {cat.name}
               </button>
             );
