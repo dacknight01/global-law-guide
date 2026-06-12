@@ -1,7 +1,10 @@
 # D-Law — Global Law Guide
 
-D-Law is an independent educational platform that simplifies public legal information into a scrollable feed of plain-language law cards. It is not affiliated with any government or legal authority.
+> D-Law is an independent educational platform that turns public legal information from many countries into a scrollable feed of plain-language law cards. It is not affiliated with any government or legal authority.
 
 ## Pages
-- / — Home feed of law cards, filterable by country and category, with search.
-- /card/{slug} — Full explanation of an individual law card.
+- [Home feed](/): Browse and search law cards by country and category.
+- [Tenant rights without a written lease](/card/tenant-rights-no-lease): What renters can expect when there is no signed lease.
+
+## Optional
+- [Sitemap](/sitemap.xml): Machine-readable index of public pages.
