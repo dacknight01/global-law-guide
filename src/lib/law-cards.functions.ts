@@ -1,9 +1,21 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { COUNTRIES, CATEGORIES } from "@/lib/dlaw-filters";
+
+const VALID_COUNTRIES = new Set(COUNTRIES.map((c) => c.code));
+const VALID_CATEGORIES = new Set(CATEGORIES.map((c) => c.code));
 
 const feedInputSchema = z.object({
-  country: z.string().max(40).default("global"),
-  category: z.string().max(40).default("all"),
+  country: z
+    .string()
+    .max(40)
+    .default("global")
+    .refine((v) => VALID_COUNTRIES.has(v), "Unknown country"),
+  category: z
+    .string()
+    .max(40)
+    .default("all")
+    .refine((v) => VALID_CATEGORIES.has(v), "Unknown category"),
   query: z.string().max(200).optional(),
   limit: z.number().int().min(1).max(30).default(12),
 });
