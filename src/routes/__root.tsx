@@ -77,6 +77,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "google-site-verification", content: "5BZYx-MI8gC340ayQUqXdXGMtyFsVX9ZkM5_2RQXlnU" },
       { name: "author", content: "D-Law" },
       { property: "og:site_name", content: "D-Law" },
       { property: "og:type", content: "website" },
