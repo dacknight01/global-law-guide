@@ -78,6 +78,7 @@ export const Route = createFileRoute("/card/$slug")({
               router.invalidate();
               reset();
             }}
+            aria-label="Retry loading this law card"
             className="mt-3 rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground"
           >
             Try again
