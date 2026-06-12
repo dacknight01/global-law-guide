@@ -68,7 +68,7 @@ function Feed() {
         <div className="max-w-2xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between gap-3 mb-3">
             <Link to="/" className="flex items-center gap-2">
-              <img src={logo} alt="D-Law" width={32} height={32} className="rounded-lg" />
+              <img src={logo} alt="D-Law — Global Law Guide logo" width={32} height={32} className="rounded-lg" />
               <div>
                 <div className="font-bold leading-tight">D-Law</div>
                 <div className="text-[10px] text-muted-foreground leading-tight">
