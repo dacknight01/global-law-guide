@@ -77,14 +77,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "D-Law AI — Global Legal Information Assistant" },
-      { name: "description", content: "Clear, neutral legal information from 195 countries. D-Law AI explains laws in plain language — not a substitute for professional legal advice." },
       { name: "author", content: "D-Law" },
-      { property: "og:site_name", content: "D-Law AI" },
+      { property: "og:site_name", content: "D-Law" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/58baf574-3d68-4970-9f1b-2dbaae5ec314" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/58baf574-3d68-4970-9f1b-2dbaae5ec314" },
     ],
     links: [
       {
@@ -98,11 +94,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "Organization",
-          name: "D-Law AI",
+          name: "D-Law",
           url: "https://global-law-guide.lovable.app",
           logo: "https://global-law-guide.lovable.app/favicon.ico",
           description:
-            "D-Law AI provides clear, neutral legal information from 195 countries in plain language.",
+            "D-Law is an independent educational platform that simplifies public legal information into plain-language law cards.",
         }),
       },
       {
@@ -110,7 +106,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "WebSite",
-          name: "D-Law AI",
+          name: "D-Law",
           url: "https://global-law-guide.lovable.app",
         }),
       },
