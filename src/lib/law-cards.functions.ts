@@ -51,16 +51,28 @@ export const getFeed = createServerFn({ method: "POST" })
       if (data.country !== "global") q = q.eq("country", data.country);
       if (data.category !== "all") q = q.eq("category", data.category);
       if (data.query && data.query.trim()) {
-        const needle = data.query.trim().toLowerCase();
-        q = q.or(
-          `title.ilike.%${needle}%,summary.ilike.%${needle}%,search_terms.ilike.%${needle}%`,
-        );
+        // Strip PostgREST filter syntax-significant chars to prevent filter injection.
+        const needle = data.query
+          .trim()
+          .toLowerCase()
+          .replace(/[,()%*\\:"']/g, " ")
+          .replace(/\s+/g, " ")
+          .trim()
+          .slice(0, 100);
+        if (needle) {
+          q = q.or(
+            `title.ilike.%${needle}%,summary.ilike.%${needle}%,search_terms.ilike.%${needle}%`,
+          );
+        }
       }
       return q;
     };
 
     const { data: existing, error } = await buildQuery();
-    if (error) throw new Error(error.message);
+    if (error) {
+      console.error("[getFeed] db error:", error);
+      throw new Error("Service temporarily unavailable.");
+    }
 
     const needsMore = (existing?.length ?? 0) < CACHE_THRESHOLD;
     if (!needsMore) return existing as FeedCard[];
