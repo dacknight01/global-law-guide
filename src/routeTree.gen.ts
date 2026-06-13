@@ -13,6 +13,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as GuideStatutesOfLimitationsRouteImport } from './routes/guide.statutes-of-limitations'
 import { Route as CardSlugRouteImport } from './routes/card.$slug'
+import { Route as ApiPublicHooksGenerateCardsRouteImport } from './routes/api/public/hooks/generate-cards'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -35,18 +36,26 @@ const CardSlugRoute = CardSlugRouteImport.update({
   path: '/card/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicHooksGenerateCardsRoute =
+  ApiPublicHooksGenerateCardsRouteImport.update({
+    id: '/api/public/hooks/generate-cards',
+    path: '/api/public/hooks/generate-cards',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/card/$slug': typeof CardSlugRoute
   '/guide/statutes-of-limitations': typeof GuideStatutesOfLimitationsRoute
+  '/api/public/hooks/generate-cards': typeof ApiPublicHooksGenerateCardsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/card/$slug': typeof CardSlugRoute
   '/guide/statutes-of-limitations': typeof GuideStatutesOfLimitationsRoute
+  '/api/public/hooks/generate-cards': typeof ApiPublicHooksGenerateCardsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -54,6 +63,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/card/$slug': typeof CardSlugRoute
   '/guide/statutes-of-limitations': typeof GuideStatutesOfLimitationsRoute
+  '/api/public/hooks/generate-cards': typeof ApiPublicHooksGenerateCardsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -62,14 +72,21 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/card/$slug'
     | '/guide/statutes-of-limitations'
+    | '/api/public/hooks/generate-cards'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/sitemap.xml' | '/card/$slug' | '/guide/statutes-of-limitations'
+  to:
+    | '/'
+    | '/sitemap.xml'
+    | '/card/$slug'
+    | '/guide/statutes-of-limitations'
+    | '/api/public/hooks/generate-cards'
   id:
     | '__root__'
     | '/'
     | '/sitemap.xml'
     | '/card/$slug'
     | '/guide/statutes-of-limitations'
+    | '/api/public/hooks/generate-cards'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -77,6 +94,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   CardSlugRoute: typeof CardSlugRoute
   GuideStatutesOfLimitationsRoute: typeof GuideStatutesOfLimitationsRoute
+  ApiPublicHooksGenerateCardsRoute: typeof ApiPublicHooksGenerateCardsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -109,6 +127,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CardSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/generate-cards': {
+      id: '/api/public/hooks/generate-cards'
+      path: '/api/public/hooks/generate-cards'
+      fullPath: '/api/public/hooks/generate-cards'
+      preLoaderRoute: typeof ApiPublicHooksGenerateCardsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -117,7 +142,18 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   CardSlugRoute: CardSlugRoute,
   GuideStatutesOfLimitationsRoute: GuideStatutesOfLimitationsRoute,
+  ApiPublicHooksGenerateCardsRoute: ApiPublicHooksGenerateCardsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
