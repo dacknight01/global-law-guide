@@ -32,6 +32,11 @@ export const Route = createFileRoute("/sitemap.xml")({
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
+  <url>
+    <loc>${BASE_URL}/guide/statutes-of-limitations</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
 ${cardEntries}
 </urlset>`;
 
