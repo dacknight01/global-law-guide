@@ -66,13 +66,14 @@ export const Route = createFileRoute("/card/$slug")({
       </div>
     </div>
   ),
-  errorComponent: ({ error, reset }) => {
+  errorComponent: ({ reset }) => {
     const router = useRouter();
     return (
       <div className="min-h-screen flex items-center justify-center p-6 text-center">
         <div>
           <h1 className="text-xl font-bold">Couldn't load this card</h1>
-          <p className="mt-2 text-sm text-muted-foreground">{error.message}</p>
+          <p className="mt-2 text-sm text-muted-foreground">Please try again in a moment.</p>
+
           <button
             onClick={() => {
               router.invalidate();

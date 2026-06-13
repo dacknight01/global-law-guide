@@ -51,16 +51,28 @@ export const getFeed = createServerFn({ method: "POST" })
       if (data.country !== "global") q = q.eq("country", data.country);
       if (data.category !== "all") q = q.eq("category", data.category);
       if (data.query && data.query.trim()) {
-        const needle = data.query.trim().toLowerCase();
-        q = q.or(
-          `title.ilike.%${needle}%,summary.ilike.%${needle}%,search_terms.ilike.%${needle}%`,
-        );
+        // Strip PostgREST filter syntax-significant chars to prevent filter injection.
+        const needle = data.query
+          .trim()
+          .toLowerCase()
+          .replace(/[,()%*\\:"']/g, " ")
+          .replace(/\s+/g, " ")
+          .trim()
+          .slice(0, 100);
+        if (needle) {
+          q = q.or(
+            `title.ilike.%${needle}%,summary.ilike.%${needle}%,search_terms.ilike.%${needle}%`,
+          );
+        }
       }
       return q;
     };
 
     const { data: existing, error } = await buildQuery();
-    if (error) throw new Error(error.message);
+    if (error) {
+      console.error("[getFeed] db error:", error);
+      throw new Error("Service temporarily unavailable.");
+    }
 
     const needsMore = (existing?.length ?? 0) < CACHE_THRESHOLD;
     if (!needsMore) return existing as FeedCard[];
@@ -97,7 +109,10 @@ export const getFeed = createServerFn({ method: "POST" })
     }
 
     const { data: refreshed, error: err2 } = await buildQuery();
-    if (err2) throw new Error(err2.message);
+    if (err2) {
+      console.error("[getFeed] db error:", err2);
+      throw new Error("Service temporarily unavailable.");
+    }
     return (refreshed ?? []) as FeedCard[];
   });
 
@@ -110,7 +125,10 @@ export const getCardBySlug = createServerFn({ method: "POST" })
       .select("id, slug, title, country, category, summary, full_explanation, rights, what_to_do")
       .eq("slug", data.slug)
       .maybeSingle();
-    if (error) throw new Error(error.message);
+    if (error) {
+      console.error("[getCardBySlug] db error:", error);
+      throw new Error("Service temporarily unavailable.");
+    }
     return (row as FullCard | null) ?? null;
   });
 
@@ -127,6 +145,9 @@ export const getRelatedCards = createServerFn({ method: "POST" })
       .neq("slug", data.excludeSlug)
       .order("created_at", { ascending: false })
       .limit(4);
-    if (error) throw new Error(error.message);
+    if (error) {
+      console.error("[getRelatedCards] db error:", error);
+      throw new Error("Service temporarily unavailable.");
+    }
     return (rows ?? []) as FeedCard[];
   });
