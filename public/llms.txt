@@ -5,6 +5,7 @@
 ## Pages
 - [Home feed](/): Browse and search law cards by country and category.
 - [Tenant rights without a written lease](/card/tenant-rights-no-lease): What renters can expect when there is no signed lease.
+- [Statute of limitations guide](/guide/statutes-of-limitations): Plain-language deadlines for debt, contracts, injury, and common crimes.
 
 ## Optional
 - [Sitemap](/sitemap.xml): Machine-readable index of public pages.
