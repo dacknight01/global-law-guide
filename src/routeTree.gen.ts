@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as GuideStatutesOfLimitationsRouteImport } from './routes/guide.statutes-of-limitations'
 import { Route as CardSlugRouteImport } from './routes/card.$slug'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -23,6 +24,12 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GuideStatutesOfLimitationsRoute =
+  GuideStatutesOfLimitationsRouteImport.update({
+    id: '/guide/statutes-of-limitations',
+    path: '/guide/statutes-of-limitations',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const CardSlugRoute = CardSlugRouteImport.update({
   id: '/card/$slug',
   path: '/card/$slug',
@@ -33,30 +40,43 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/card/$slug': typeof CardSlugRoute
+  '/guide/statutes-of-limitations': typeof GuideStatutesOfLimitationsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/card/$slug': typeof CardSlugRoute
+  '/guide/statutes-of-limitations': typeof GuideStatutesOfLimitationsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/card/$slug': typeof CardSlugRoute
+  '/guide/statutes-of-limitations': typeof GuideStatutesOfLimitationsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/sitemap.xml' | '/card/$slug'
+  fullPaths:
+    | '/'
+    | '/sitemap.xml'
+    | '/card/$slug'
+    | '/guide/statutes-of-limitations'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/sitemap.xml' | '/card/$slug'
-  id: '__root__' | '/' | '/sitemap.xml' | '/card/$slug'
+  to: '/' | '/sitemap.xml' | '/card/$slug' | '/guide/statutes-of-limitations'
+  id:
+    | '__root__'
+    | '/'
+    | '/sitemap.xml'
+    | '/card/$slug'
+    | '/guide/statutes-of-limitations'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   CardSlugRoute: typeof CardSlugRoute
+  GuideStatutesOfLimitationsRoute: typeof GuideStatutesOfLimitationsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -75,6 +95,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/guide/statutes-of-limitations': {
+      id: '/guide/statutes-of-limitations'
+      path: '/guide/statutes-of-limitations'
+      fullPath: '/guide/statutes-of-limitations'
+      preLoaderRoute: typeof GuideStatutesOfLimitationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/card/$slug': {
       id: '/card/$slug'
       path: '/card/$slug'
@@ -89,6 +116,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   CardSlugRoute: CardSlugRoute,
+  GuideStatutesOfLimitationsRoute: GuideStatutesOfLimitationsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
