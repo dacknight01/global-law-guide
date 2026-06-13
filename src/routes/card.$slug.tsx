@@ -66,7 +66,7 @@ export const Route = createFileRoute("/card/$slug")({
       </div>
     </div>
   ),
-  errorComponent: ({ error, reset }) => {
+  errorComponent: ({ reset }) => {
     const router = useRouter();
     return (
       <div className="min-h-screen flex items-center justify-center p-6 text-center">
