@@ -97,12 +97,13 @@ export const getFeed = createServerFn({ method: "POST" })
       );
     }
 
-    const { data: refreshed, error: err2 } = await buildQuery();
+    const { rows: refreshed, error: err2 } = await runSearch();
     if (err2) {
       console.error("[getFeed] db error:", err2);
       throw new Error("Service temporarily unavailable.");
     }
-    return (refreshed ?? []) as FeedCard[];
+    return refreshed;
+
   });
 
 export const getCardBySlug = createServerFn({ method: "POST" })
