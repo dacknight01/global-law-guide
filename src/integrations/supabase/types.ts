@@ -61,7 +61,22 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      search_law_cards: {
+        Args: {
+          _category?: string
+          _country?: string
+          _lim?: number
+          _query?: string
+        }
+        Returns: {
+          category: string
+          country: string
+          id: string
+          slug: string
+          summary: string
+          title: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
