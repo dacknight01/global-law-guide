@@ -88,7 +88,7 @@ export const getFeed = createServerFn({ method: "POST" })
         search_terms: c.search_terms.slice(0, 400),
       }));
 
-      await supabaseAdmin.from("law_cards").insert(rows);
+      if (rows.length > 0) await supabaseAdmin.from("law_cards").insert(rows);
     } catch (e) {
       console.error("law card generation failed", e);
       if (existing && existing.length > 0) return existing as FeedCard[];
