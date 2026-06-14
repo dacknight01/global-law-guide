@@ -100,7 +100,7 @@ const INJECTION_PATTERNS = [
   /ignore (?:all |any |the )?(?:previous|prior|above) (?:instructions|rules|prompt)/i,
   /you are (?:now |actually )?(?:a |an |the )?(?:court|judge|police|government|official|authority|admin|system)/i,
   /system prompt/i,
-  /</?topic>/i,
+  /<\/?topic>/i,
   /\bact as\b/i,
   /this is (?:an )?official (?:ruling|order|fine|notice)/i,
   /you (?:must|are ordered to) pay/i,
