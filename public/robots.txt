@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
+Disallow: /api/
+Disallow: /sitemap.xml
 
 Sitemap: https://global-law-guide.lovable.app/sitemap.xml
