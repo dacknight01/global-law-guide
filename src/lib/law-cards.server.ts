@@ -90,8 +90,47 @@ Never invent specific statute numbers. If a rule varies, say "rules vary — che
     experimental_output: Output.object({ schema: batchSchema }),
   });
 
-  return experimental_output.cards;
+  return experimental_output.cards.filter(isSafeCard);
 }
+
+// Reject AI output that's malformed, too short/long, or that looks like
+// successful prompt-injection (model claiming authority, role changes,
+// echoing injection markers, etc). Keeps poisoned cards out of the DB.
+const INJECTION_PATTERNS = [
+  /ignore (?:all |any |the )?(?:previous|prior|above) (?:instructions|rules|prompt)/i,
+  /you are (?:now |actually )?(?:a |an |the )?(?:court|judge|police|government|official|authority|admin|system)/i,
+  /system prompt/i,
+  /</?topic>/i,
+  /\bact as\b/i,
+  /this is (?:an )?official (?:ruling|order|fine|notice)/i,
+  /you (?:must|are ordered to) pay/i,
+];
+
+function isSafeCard(c: GeneratedCard): boolean {
+  const lens = {
+    title: c.title?.length ?? 0,
+    summary: c.summary?.length ?? 0,
+    full: c.full_explanation?.length ?? 0,
+    rights: c.rights?.length ?? 0,
+    what: c.what_to_do?.length ?? 0,
+    terms: c.search_terms?.length ?? 0,
+  };
+  if (lens.title < 8 || lens.title > 200) return false;
+  if (lens.summary < 20 || lens.summary > 700) return false;
+  if (lens.full < 80 || lens.full > 4000) return false;
+  if (lens.rights < 10 || lens.rights > 2000) return false;
+  if (lens.what < 10 || lens.what > 2000) return false;
+  if (lens.terms < 3 || lens.terms > 500) return false;
+
+  const blob = [c.title, c.summary, c.full_explanation, c.rights, c.what_to_do]
+    .join("\n")
+    .toLowerCase();
+  for (const re of INJECTION_PATTERNS) {
+    if (re.test(blob)) return false;
+  }
+  return true;
+}
+
 
 export function slugify(title: string): string {
   const base = title
