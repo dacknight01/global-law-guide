@@ -35,6 +35,13 @@ export const Route = createFileRoute("/api/public/hooks/generate-cards")({
             search_terms: c.search_terms.slice(0, 400),
           }));
 
+          if (rows.length === 0) {
+            return new Response(
+              JSON.stringify({ ok: true, inserted: 0, country, category, note: "no valid cards" }),
+              { headers: { "Content-Type": "application/json" } },
+            );
+          }
+
           const { error } = await supabaseAdmin.from("law_cards").insert(rows);
           if (error) {
             console.error("[generate-cards] insert error:", error);
@@ -43,6 +50,7 @@ export const Route = createFileRoute("/api/public/hooks/generate-cards")({
               { status: 500, headers: { "Content-Type": "application/json" } },
             );
           }
+
 
           return new Response(
             JSON.stringify({ ok: true, inserted: rows.length, country, category }),
