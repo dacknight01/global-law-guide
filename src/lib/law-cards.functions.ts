@@ -42,37 +42,26 @@ export const getFeed = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<FeedCard[]> => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const buildQuery = () => {
-      let q = supabaseAdmin
-        .from("law_cards")
-        .select("id, slug, title, country, category, summary")
-        .order("created_at", { ascending: false })
-        .limit(data.limit);
-      if (data.country !== "global") q = q.eq("country", data.country);
-      if (data.category !== "all") q = q.eq("category", data.category);
-      if (data.query && data.query.trim()) {
-        // Strip PostgREST filter syntax-significant chars to prevent filter injection.
-        const needle = data.query
-          .trim()
-          .toLowerCase()
-          .replace(/[,()%*\\:"']/g, " ")
-          .replace(/\s+/g, " ")
-          .trim()
-          .slice(0, 100);
-        if (needle) {
-          q = q.or(
-            `title.ilike.%${needle}%,summary.ilike.%${needle}%,search_terms.ilike.%${needle}%`,
-          );
-        }
-      }
-      return q;
+    const needle = data.query
+      ? data.query.trim().toLowerCase().slice(0, 100)
+      : "";
+
+    const runSearch = async () => {
+      const { data: rows, error } = await supabaseAdmin.rpc("search_law_cards", {
+        _country: data.country,
+        _category: data.category,
+        _query: needle.length > 0 ? needle : undefined,
+        _lim: data.limit,
+      });
+      return { rows: (rows ?? []) as FeedCard[], error };
     };
 
-    const { data: existing, error } = await buildQuery();
+    const { rows: existing, error } = await runSearch();
     if (error) {
       console.error("[getFeed] db error:", error);
       throw new Error("Service temporarily unavailable.");
     }
+
 
     const needsMore = (existing?.length ?? 0) < CACHE_THRESHOLD;
     if (!needsMore) return existing as FeedCard[];
@@ -99,7 +88,7 @@ export const getFeed = createServerFn({ method: "POST" })
         search_terms: c.search_terms.slice(0, 400),
       }));
 
-      await supabaseAdmin.from("law_cards").insert(rows);
+      if (rows.length > 0) await supabaseAdmin.from("law_cards").insert(rows);
     } catch (e) {
       console.error("law card generation failed", e);
       if (existing && existing.length > 0) return existing as FeedCard[];
@@ -108,12 +97,13 @@ export const getFeed = createServerFn({ method: "POST" })
       );
     }
 
-    const { data: refreshed, error: err2 } = await buildQuery();
+    const { rows: refreshed, error: err2 } = await runSearch();
     if (err2) {
       console.error("[getFeed] db error:", err2);
       throw new Error("Service temporarily unavailable.");
     }
-    return (refreshed ?? []) as FeedCard[];
+    return refreshed;
+
   });
 
 export const getCardBySlug = createServerFn({ method: "POST" })
