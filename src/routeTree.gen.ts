@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as GuideStatutesOfLimitationsRouteImport } from './routes/guide.statutes-of-limitations'
+import { Route as GuideImmigrationRightsRouteImport } from './routes/guide.immigration-rights'
 import { Route as CardSlugRouteImport } from './routes/card.$slug'
 import { Route as ApiPublicHooksGenerateCardsRouteImport } from './routes/api/public/hooks/generate-cards'
 
@@ -31,6 +32,11 @@ const GuideStatutesOfLimitationsRoute =
     path: '/guide/statutes-of-limitations',
     getParentRoute: () => rootRouteImport,
   } as any)
+const GuideImmigrationRightsRoute = GuideImmigrationRightsRouteImport.update({
+  id: '/guide/immigration-rights',
+  path: '/guide/immigration-rights',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CardSlugRoute = CardSlugRouteImport.update({
   id: '/card/$slug',
   path: '/card/$slug',
@@ -47,6 +53,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/card/$slug': typeof CardSlugRoute
+  '/guide/immigration-rights': typeof GuideImmigrationRightsRoute
   '/guide/statutes-of-limitations': typeof GuideStatutesOfLimitationsRoute
   '/api/public/hooks/generate-cards': typeof ApiPublicHooksGenerateCardsRoute
 }
@@ -54,6 +61,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/card/$slug': typeof CardSlugRoute
+  '/guide/immigration-rights': typeof GuideImmigrationRightsRoute
   '/guide/statutes-of-limitations': typeof GuideStatutesOfLimitationsRoute
   '/api/public/hooks/generate-cards': typeof ApiPublicHooksGenerateCardsRoute
 }
@@ -62,6 +70,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/card/$slug': typeof CardSlugRoute
+  '/guide/immigration-rights': typeof GuideImmigrationRightsRoute
   '/guide/statutes-of-limitations': typeof GuideStatutesOfLimitationsRoute
   '/api/public/hooks/generate-cards': typeof ApiPublicHooksGenerateCardsRoute
 }
@@ -71,6 +80,7 @@ export interface FileRouteTypes {
     | '/'
     | '/sitemap.xml'
     | '/card/$slug'
+    | '/guide/immigration-rights'
     | '/guide/statutes-of-limitations'
     | '/api/public/hooks/generate-cards'
   fileRoutesByTo: FileRoutesByTo
@@ -78,6 +88,7 @@ export interface FileRouteTypes {
     | '/'
     | '/sitemap.xml'
     | '/card/$slug'
+    | '/guide/immigration-rights'
     | '/guide/statutes-of-limitations'
     | '/api/public/hooks/generate-cards'
   id:
@@ -85,6 +96,7 @@ export interface FileRouteTypes {
     | '/'
     | '/sitemap.xml'
     | '/card/$slug'
+    | '/guide/immigration-rights'
     | '/guide/statutes-of-limitations'
     | '/api/public/hooks/generate-cards'
   fileRoutesById: FileRoutesById
@@ -93,6 +105,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   CardSlugRoute: typeof CardSlugRoute
+  GuideImmigrationRightsRoute: typeof GuideImmigrationRightsRoute
   GuideStatutesOfLimitationsRoute: typeof GuideStatutesOfLimitationsRoute
   ApiPublicHooksGenerateCardsRoute: typeof ApiPublicHooksGenerateCardsRoute
 }
@@ -120,6 +133,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GuideStatutesOfLimitationsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/guide/immigration-rights': {
+      id: '/guide/immigration-rights'
+      path: '/guide/immigration-rights'
+      fullPath: '/guide/immigration-rights'
+      preLoaderRoute: typeof GuideImmigrationRightsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/card/$slug': {
       id: '/card/$slug'
       path: '/card/$slug'
@@ -141,9 +161,20 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   CardSlugRoute: CardSlugRoute,
+  GuideImmigrationRightsRoute: GuideImmigrationRightsRoute,
   GuideStatutesOfLimitationsRoute: GuideStatutesOfLimitationsRoute,
   ApiPublicHooksGenerateCardsRoute: ApiPublicHooksGenerateCardsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
