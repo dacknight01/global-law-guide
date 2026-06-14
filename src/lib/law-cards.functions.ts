@@ -50,7 +50,7 @@ export const getFeed = createServerFn({ method: "POST" })
       const { data: rows, error } = await supabaseAdmin.rpc("search_law_cards", {
         _country: data.country,
         _category: data.category,
-        _query: needle.length > 0 ? needle : null,
+        _query: needle.length > 0 ? needle : undefined,
         _lim: data.limit,
       });
       return { rows: (rows ?? []) as FeedCard[], error };
