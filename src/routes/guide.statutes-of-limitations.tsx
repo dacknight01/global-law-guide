@@ -3,7 +3,7 @@ import { ArrowLeft, ShieldCheck, Clock } from "lucide-react";
 import { DISCLAIMER } from "@/lib/dlaw-filters";
 
 const URL = "https://global-law-guide.lovable.app/guide/statutes-of-limitations";
-const TITLE = "Statute of Limitations Guide: Legal Deadlines Explained — D-Law";
+const TITLE = "Statute of Limitations Guide: Legal Deadlines — D-Law";
 const DESCRIPTION =
   "Plain-language guide to statutes of limitations: how long you have to sue or be charged for debt, contracts, injury, and common crimes.";
 
